@@ -1,0 +1,21 @@
+.main {
+  height: 100vh;
+}
+
+.input1 {
+  background-color : rgb(53, 12, 12);
+  border: 0 none white ;
+  font-size: 16px;
+  border-radius: 15px;
+  padding: 8px;
+  height: 40px !important
+}
+
+table {
+  display: block;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
+  margin: 0 auto;
+  overflow-x: auto;
+  white-space: nowrap;
+}

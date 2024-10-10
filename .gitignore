@@ -1,0 +1,12 @@
+.DS_Store
+oldfiles/
+config.py
+function.py
+rPractice.py
+function.py
+rPractice.py
+extrapy/
+debug.log
+note.txt
+
+__pycache__

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" href="{{headLogo}}">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+</head>
+
+<main role="main" class="container-md">
+    <body style="background:black">
+        <div id="vue-app" style="background:black">
+            <div :class="getMargin()" id="alertdesk">
+
+                <table class="table table-dark" class="table-responsive">
+                    <thead>
+                    <tr>
+                        <th scope="col" colspan='3' ><h3 style="color:white">NK Screener Dashboard [[date]]</h3></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td scope="row">
+                                <button @click="getData()" type="button" class="btn btn btn-secondary"> [[API]] </button>
+                            </td >
+                            <td class="" scope="row"><span @click="">Auth Code: </span>
+                                <input type="number" class="bg-dark text-white input1" v-model="passcode"> </input>
+                            </td>
+                            <td class="" style="width:20%">
+                                Webhook: <span id="copywebhook1" @click="copyWebhook()">[[getWebhook(1)]]</span> <br> <br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="" style="width:20%">
+                                <span @click="">Day</span><br>
+                                <input type="number" class="bg-dark text-white input1" v-model="day"> </input> <br>
+                            </td>
+                            <td class="" style="width:20%">
+                                <span @click="">Month</span><br>
+                                <input type="number" class="bg-dark text-white input1" v-model="month"> </input> <br>
+                            </td>
+                            <td class="" style="width:20%">
+                                <span @click="">Year</span><br>
+                                <input type="number" class="bg-dark text-white input1" v-model="year"> </input> <br>
+                            </td>
+                            <td class="" style="width:20%">
+                                <span @click="">Timeframe (D/W) </span><br>
+                                <input style="" class="bg-dark text-white input1" v-model="tf"> </input> <br>
+                            </td>
+                            <td class="" style="width:20%">
+                                <button @click="getCopy()" type="button" class="btn btn btn-secondary"> Copy Table </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                Saved [[tf]] [[ saved ]]
+                            </td>
+                            <td colspan='4'>
+                                Missing Sets: [[ miss ]]
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+                <table id="resultsTable" class="table table-dark" class="table-responsive">
+                    <thead style="position:sticky;z-index:5;top:0px;">
+                    <tr>
+                        <th scope="col" :style="">Set - Number</th>
+                        <th scope="col" :style="">Ticker</th>
+                        <th scope="col" :style="">Day</th>
+                        <th scope="col" :style="">Signal</th>
+                        <th scope="col" :style="">Watchlist</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="(item, index) in alerts" :key="index" >
+                            <tr class="">
+                                <td>[[ index ]]</td>
+                                <td>[[ item.key ]]</td>
+                                <td>[[ item.day ]]</td>
+                                <td>[[ item.alert ]]</td>
+                                <td>[[ item.group ]]</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+
+                <table class="table table-dark" class="table-responsive">
+                    <tbody>
+                        <tr class="">
+                            <td class= "text-xsmall"><button class="btn btn-sm btn-info" @click="showLogs=!showLogs">Logs</button> </th>
+                        </tr>
+
+                        <template v-for="(txt, line) in logs" :key="line" >
+                            <tr v-if="showLogs && checkTxt(txt)" class="">
+                                <td class="fs-6"><span :style="getLogStyle(txt)">[[txt]]</span> </th>
+                            </tr>
+                        </template>
+
+                    </tbody>
+                </table>
+                <br>
+            </div> <!-- end alert desk-->
+
+        </div> <!-- end vue app-->
+    </body>
+</main>
+
+{% block script %}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+<script type="text/javascript">
+
+var report = navigator.userAgent
+// console.log(report)
+
+let mobile = false
+
+if (report.includes('Android') || report.includes('iPhone') ) {
+    mobile = true
+    console.log('mobile')
+}
+
+
+startVue()
+
+function startVue(){
+
+let vue = new Vue({
+
+    el: '#vue-app',
+    delimiters: ['[[', ']]'],
+    mounted: function() {
+        let code = localStorage.getItem('code')
+
+
+        if (code) {
+            this.passcode = code
+            localStorage.removeItem("code")
+            this.getData()
+
+        }
+
+        this.month = new Date().getMonth() + 1
+
+        if (new Date().getDate() == 1) {
+            this.day = 31
+            this.month = new Date().getMonth()
+        } else {
+            this.day = new Date().getDate() - 1
+        }
+
+        this.year = new Date().getFullYear()
+        console.log(this.day)
+
+        this.getData()
+    },
+    data: {
+        date : '',
+        showLogs: true,
+        mobile : mobile,
+        API : 'API',
+        tableFilter : '',
+        count: 100,
+        exchange: '',
+        rows: 100,
+        alerts: {},
+        sets:[],
+        miss:[],
+        saved:[],
+        modes: {},
+        logs: [],
+        passcode: 0,
+        showAsset: {},
+        modeStr: '',
+        day: '',
+        month: '',
+        year: '',
+        tf: 'D',
+        user: '',
+        sheets: {},
+        assets: {},
+    },
+    methods: {
+        getCopy: function () {
+            //e.preventDefault();
+            var table = document.getElementById('resultsTable');
+
+            if (navigator.clipboard) {
+                var text = table.innerText.trim();
+                navigator.clipboard.writeText(text).catch(function () { });
+            }
+            alert('DATA COPIED TO CLIPBOARD')
+        },
+        copyWebhook: function () {
+            //e.preventDefault();
+            var table = document.getElementById('copywebhook1');
+
+            if (navigator.clipboard) {
+                var text = table.innerText.trim();
+                navigator.clipboard.writeText(text).catch(function () { });
+            }
+            alert('WEBHOOK COPIED TO CLIPBOARD')
+        },
+        getWebhook: function (int) {
+            let wh = 'https://' + this.user + '.pythonanywhere.com/webhook'
+
+            //console.log(wh)
+            return wh
+        },
+        checkTxt: function (txt) {
+            if (txt.includes('HTTP')) {
+                return false
+            }
+            return true
+        },
+        getLogStyle: function (txt) {
+            if (txt.includes('WEBHOOK DATA')) {
+                return {color:'pink'}
+            } else if (txt.includes('WARNING')) {
+                return {color:'gold'}
+            } else if (txt.includes('INFO')) {
+                return {color:'aqua'}
+            } else if (txt.includes('ERROR')) {
+                return {color:'red'}
+            }
+        },
+        getTimeStamp: function (timeStr) {
+            return new Date(timeStr).getTime()/1000
+        },
+        getMargin: function () {
+            if (this.mobile) {
+                return ""
+            } else {
+                return "content-section m-5 bg-dark rounded"
+            }
+        },
+        getData: function () {
+            this.API = 'Accessing API...'
+            // console.log('getData')
+
+            $.ajax({
+                data : {
+                    pw: this.passcode,
+                    day: this.day,
+                    month: this.month,
+                    year: this.year,
+                    tf: this.tf,
+                },
+                type : 'POST',
+                url : '/getData'
+
+            })
+            .done(function(data) {
+                // console.log(data)
+                if (data.error) {
+                    vue.API = 'API'
+                    alert(data.error)
+                    //localStorage.setItem('code', null)
+                    return false
+                } else {
+                    //vue.getAssets()
+                    parseData = JSON.parse(data)
+                    vue.alerts = parseData['alerts']
+                    vue.sets = parseData['sets']
+                    vue.miss = parseData['miss']
+                    vue.saved = parseData['saved']
+                    console.log(vue.alerts)
+                    vue.user = parseData['user']
+                    console.log(localStorage.getItem('ticker'))
+                    vue.logs = parseData['logs']
+                    console.log(parseData)
+                    localStorage.setItem('code', vue.passcode )
+                    vue.API = 'API'
+                }
+            })
+            .fail(function(){
+                  alert('error has occurred getData');
+            });
+        }
+    },
+    computed: {
+    }
+})// end NEW VUE
+
+}
+
+</script>
+
+{% endblock %}
+
+
+
