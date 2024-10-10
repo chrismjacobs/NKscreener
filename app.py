@@ -23,7 +23,7 @@ def updateJSON(dataDict):
     print(dataDict)
     rName = 'NK_' + tf
 
-    storeTF = r.get(rName)
+    storeTF = json.loads(r.get(rName))
     # try:
     #     print('LOAD', tf + '.json')
     #     with open(tf + '.json', 'r') as json_file:
