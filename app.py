@@ -136,6 +136,11 @@ def tradingview_webhook():
     return 'TV WEBHOOK COMPLETE'
 
 
+@app.route("/ping", methods=['POST'])
+def ping_webhook():
+    logger.warning('PING RECEIVED')
+    return 'PING'
+
 def sortData(alerts):
     alertKeys = list(alerts.keys())
     alertKeys.sort()
