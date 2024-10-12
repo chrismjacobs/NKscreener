@@ -31,7 +31,7 @@
                             <td class="" scope="row"><span @click="">Auth Code: </span>
                                 <input type="number" class="bg-dark text-white input1" v-model="passcode"> </input>
                             </td>
-                            <td class="" style="width:20%">
+                            <td class="" style="width:20%;display:none">
                                 Webhook: <span id="copywebhook1" @click="copyWebhook()">[[getWebhook(1)]]</span> <br> <br>
                             </td>
                         </tr>
@@ -144,13 +144,6 @@ let vue = new Vue({
         let code = localStorage.getItem('code')
 
 
-        if (code) {
-            this.passcode = code
-            localStorage.removeItem("code")
-            this.getData()
-
-        }
-
         this.month = new Date().getMonth() + 1
 
         if (new Date().getDate() == 1) {
@@ -163,7 +156,12 @@ let vue = new Vue({
         this.year = new Date().getFullYear()
         console.log(this.day)
 
-        this.getData()
+        if (code) {
+            this.passcode = code
+            localStorage.removeItem("code")
+            this.getData()
+
+        }
     },
     data: {
         date : '',
