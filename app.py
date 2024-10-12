@@ -24,15 +24,6 @@ def updateJSON(dataDict):
     rName = 'NK_' + tf
 
     storeTF = json.loads(r.get(rName))
-    # try:
-    #     print('LOAD', tf + '.json')
-    #     with open(tf + '.json', 'r') as json_file:
-    #         storeTF = json.load(json_file)
-    # except Exception as e:
-    #     logger.error('JSON LOAD EXCEPTION ' + str(e))
-    #     print('NO STORE FOUND')
-    #     with open(tf + '.json', 'w') as json_file:
-    #         json.dump(storeTF, json_file)
 
     sheetName = dataDict['force'].strip()
     print('SHEETNAME', sheetName)
@@ -88,8 +79,6 @@ def updateJSON(dataDict):
     postStored = list(newJSON.keys())
     print('NEWLIST', postStored)
     r.set(rName, json.dumps(newJSON))
-    # with open(tf + '.json', 'w') as json_file:
-    #     json.dump(newJSON, json_file)
 
     return True
 
@@ -178,13 +167,6 @@ def getData():
     store = {}
     rName = 'NK_' + tf
     store = json.loads(r.get(rName))
-    # try:
-    #     with open(tf + '.json', 'r') as json_file:
-    #         store = json.load(json_file)
-    # except:
-    #     with open(tf + '.json', 'w') as json_file:
-    #         json.dump(store, json_file)
-
     dataDict = {}
 
     dataDict['user'] = USER
@@ -235,10 +217,6 @@ def getData():
     return json.dumps(dataDict)
 
 
-# with open ('compiled.json', 'r') as json_file:
-#     dataDict = json.load(json_file)
-
-# updateJSON(dataDict)
 
 
 
