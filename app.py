@@ -210,6 +210,7 @@ def tradingview_webhook():
 
 @app.route("/intraday", methods=['POST'])
 def tradingview_intraday():
+    print('INTRADAY')
 
     dataDict = None
 
