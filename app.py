@@ -88,8 +88,22 @@ def updateJSON(dataDict):
 def sendMessage(_signal, DHOOK, _ticker, _group, _index):
     str1 = "```ansi\n"
 
-    escape =  "\u001b[0;"   ## 0 == normal text  1 bold
+    ## 0 = normal text  1 = bold text   4 = Underline
+    zeroUse = 1
+    crossUse = 0
+    colorChoice = {
+        'A' : 'yellow',
+        'B' : 'pink',
+        'C' : 'cyan'
+    }
 
+
+    escape =  "\u001b[" + str(crossUse) + ";"
+
+    if 'ZERO' in _signal:
+        escape =  "\u001b[" + str(zeroUse) + ";"
+
+    ## High Intensity [0;91m] instead of 31m
 
     colors = {  ### bg / text
         '': [''],
@@ -107,18 +121,13 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
     str2 = "\n```"
 
     textCol = 'white'
-    if '1' in _signal:
-        textCol = 'blue'
-        if 'ZERO' in _signal:
-            textCol = 'cyan'
-    if '2' in _signal:
-        textCol = 'red'
-        if 'ZERO' in _signal:
-            textCol = 'pink'
-    if '3' in _signal:
-        textCol = 'green'
-        if 'ZERO' in _signal:
-            textCol = 'yellow'
+    if '_A' in _signal:
+        textCol = colorChoice['A']
+    if '_B' in _signal:
+        textCol = colorChoice['B']
+    if '_C' in _signal:
+        textCol = colorChoice['C']
+
 
     message = _ticker + ' ' + _signal + ' ' + _group + ' ' + _index
 
@@ -135,7 +144,7 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
 def getSignal(dataDict):
 
     tf = dataDict['tf']
-    print(dataDict)
+
     DDICT = {
         '60' : DHOOK_H1,
         '240' : DHOOK_H4
@@ -143,15 +152,14 @@ def getSignal(dataDict):
 
     DHOOK = DDICT[tf]
 
-
     groups = dataDict['groups']
     messagesString = dataDict['mess']
-    print(messagesString)
+    # print(messagesString)
     # "[MD_1, MD_2, MD_3, MD_1 ZERO, MD_2 ZERO, MD_3 ZERO]"
     messages1 = messagesString.split('[')[1]
-    print(messages1)
+    # print(messages1)
     messages2 = messages1.split(']')[0]
-    print(messages2)
+    # print(messages2)
     messages = messages2.split(',')
     print(messages)
 
@@ -164,18 +172,19 @@ def getSignal(dataDict):
         alertStrSplit = alertStr.split(')')
         print(alertStrSplit)
         dayStr = alertStrSplit[0].split('(')[1]
-        print(dayStr)
 
         triggers = ''
 
         for tr in alertStrSplit[1].split(';'):
-            print(t, tr, tickers)
+            # print(t, tr, tickers)
             _signal = messages[int(tr)].strip()
-            print('S', _signal)
+            # print('S', _signal)
             _ticker = tickers[t]['key']
-            print('T', _ticker)
-            _group = groups[int(tickers[t]['g'])]
-            print('G', _group)
+            # print('T', _ticker)
+            _group = 'Unknown'
+            if len(groups) > 0:
+                _group = groups[int(tickers[t]['g'])]
+            # print('G', _group)
             _index = t
             print('sendMessage')
             sendMessage(_signal, DHOOK, _ticker, _group, _index)
