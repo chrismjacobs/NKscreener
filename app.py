@@ -106,7 +106,7 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
 
     str2 = "\n```"
 
-    textCol = 'pink'
+    textCol = 'white'
     if '1' in _signal:
         textCol = 'blue'
         if 'ZERO' in _signal:
@@ -146,10 +146,14 @@ def getSignal(dataDict):
 
     groups = dataDict['groups']
     messagesString = dataDict['mess']
+    print(messagesString)
     # "[MD_1, MD_2, MD_3, MD_1 ZERO, MD_2 ZERO, MD_3 ZERO]"
     messages1 = messagesString.split('[')[1]
+    print(messages1)
     messages2 = messages1.split(']')[0]
+    print(messages2)
     messages = messages2.split(',')
+    print(messages)
 
     tickers = dataDict['tickers']
 
@@ -158,7 +162,9 @@ def getSignal(dataDict):
 
         alertStr = tickers[t]['alert']
         alertStrSplit = alertStr.split(')')
+        print(alertStrSplit)
         dayStr = alertStrSplit[0].split('(')[1]
+        print(dayStr)
 
         triggers = ''
 
@@ -167,6 +173,7 @@ def getSignal(dataDict):
             _ticker = tickers[t]['key']
             _group = groups[int(tickers[t]['g'])]
             _index = t
+            print('sendMessage')
             sendMessage(_signal, DHOOK, _ticker, _group, _index)
 
     return True
