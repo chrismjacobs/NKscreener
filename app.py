@@ -195,13 +195,12 @@ def tradingview_webhook():
         logger.error('TV CODE EXCEPTION: ' + str(e))
         return 'ERROR'
 
-
     try:
-        resultCheck = getSignal(dataDict)
-        m = 'SEND MESSAGE: ' + str(resultCheck)
+        resultCheck = updateJSON(dataDict)
+        m = 'UPDATE JSON: ' + str(resultCheck)
         logger.debug(m)
     except Exception as e:
-        m = 'SEND MESSAGE: ' + str(e)
+        m = 'UPDATE JSON: ' + str(e)
         logger.error(m)
 
 
@@ -238,13 +237,12 @@ def tradingview_intraday():
         logger.error('TV CODE EXCEPTION: ' + str(e))
         return 'ERROR'
 
-
     try:
-        resultCheck = updateJSON(dataDict)
-        m = 'UPDATE JSON: ' + str(resultCheck)
+        resultCheck = getSignal(dataDict)
+        m = 'SEND MESSAGE: ' + str(resultCheck)
         logger.debug(m)
     except Exception as e:
-        m = 'UPDATE JSON: ' + str(e)
+        m = 'SEND MESSAGE: ' + str(e)
         logger.error(m)
 
 
