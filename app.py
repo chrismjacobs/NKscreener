@@ -89,7 +89,7 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
     str1 = "```ansi\n"
 
     ## 0 = normal text  1 = bold text   4 = Underline
-    zeroUse = 1
+    zeroUse = 4
     crossUse = 0
     colorChoice = {
         'A' : 'yellow',
@@ -108,13 +108,13 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
     colors = {  ### bg / text
         '': [''],
         'grey': ['44;'],
-        'red' : ['45;', '31m'],
-        'green' : ['43;', '32m'],
-        'yellow' : ['41;', '33m'],
-        'blue' : ['40;', '34m'],
-        'pink' : ['45;', '35m'],
-        'cyan' : ['42;', '36m'],
-        'white' : ['47;', '37m']
+        'red' : ['45;', '91m'],
+        'green' : ['43;', '92m'],
+        'yellow' : ['41;', '93m'],
+        'blue' : ['40;', '94m'],
+        'pink' : ['45;', '95m'],
+        'cyan' : ['42;', '96m'],
+        'white' : ['47;', '97m']
     }
     ## bground first then color
 
