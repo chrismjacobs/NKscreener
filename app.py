@@ -109,10 +109,16 @@ def sendMessage(_signal, DHOOK, _ticker, _group, _index):
     textCol = 'pink'
     if '1' in _signal:
         textCol = 'blue'
+        if 'ZERO' in _signal:
+            textCol = 'cyan'
     if '2' in _signal:
         textCol = 'red'
+        if 'ZERO' in _signal:
+            textCol = 'pink'
     if '3' in _signal:
         textCol = 'green'
+        if 'ZERO' in _signal:
+            textCol = 'yellow'
 
     message = _ticker + ' ' + _signal + ' ' + _group + ' ' + _index
 
