@@ -169,9 +169,13 @@ def getSignal(dataDict):
         triggers = ''
 
         for tr in alertStrSplit[1].split(';'):
+            print(t, tr, tickers)
             _signal = messages[int(tr)].strip()
+            print('S', _signal)
             _ticker = tickers[t]['key']
+            print('T', _ticker)
             _group = groups[int(tickers[t]['g'])]
+            print('G', _group)
             _index = t
             print('sendMessage')
             sendMessage(_signal, DHOOK, _ticker, _group, _index)
