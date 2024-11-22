@@ -1,10 +1,11 @@
 from flask import Flask, request, render_template, jsonify
 import json
 from datetime import datetime, timezone
-from settings import SECRET_KEY, TVCODE, USER, DEBUG, RANGE, auth_required, r
+from settings import SECRET_KEY, TVCODE, USER, DEBUG, RANGE, auth_required, r, DHOOK_H1, DHOOK_H4
 from logHandler import logger
 import time
 import redis
+import requests
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -83,6 +84,88 @@ def updateJSON(dataDict):
     return True
 
 
+
+def sendMessage(_signal, DHOOK, _ticker, _group, _index):
+    str1 = "```ansi\n"
+
+    escape =  "\u001b[0;"   ## 0 == normal text  1 bold
+
+
+    colors = {  ### bg / text
+        '': [''],
+        'grey': ['44;'],
+        'red' : ['45;', '31m'],
+        'green' : ['43;', '32m'],
+        'yellow' : ['41;', '33m'],
+        'blue' : ['40;', '34m'],
+        'pink' : ['45;', '35m'],
+        'cyan' : ['42;', '36m'],
+        'white' : ['47;', '37m']
+    }
+    ## bground first then color
+
+    str2 = "\n```"
+
+    textCol = 'pink'
+    if '1' in _signal:
+        textCol = 'blue'
+    if '2' in _signal:
+        textCol = 'red'
+    if '3' in _signal:
+        textCol = 'green'
+
+    message = _ticker + ' ' + _signal + ' ' + _group + ' ' + _index
+
+    msg = str1 + escape +  colors[''][0] + colors[textCol][1] + message + str2
+
+
+    data = {'content': msg}
+    response = requests.post(DHOOK, json=data)
+    print(response)
+
+    return True
+
+
+def getSignal(dataDict):
+
+    tf = dataDict['tf']
+    print(dataDict)
+    DDICT = {
+        '60' : DHOOK_H1,
+        '240' : DHOOK_H4
+    }
+
+    DHOOK = DDICT[tf]
+
+
+    groups = dataDict['groups']
+    messagesString = dataDict['mess']
+    # "[MD_1, MD_2, MD_3, MD_1 ZERO, MD_2 ZERO, MD_3 ZERO]"
+    messages1 = messagesString.split('[')[1]
+    messages2 = messages1.split(']')[0]
+    messages = messages2.split(',')
+
+    tickers = dataDict['tickers']
+
+    for t in tickers:
+        #"(5)15;16;17;28"
+
+        alertStr = tickers[t]['alert']
+        alertStrSplit = alertStr.split(')')
+        dayStr = alertStrSplit[0].split('(')[1]
+
+        triggers = ''
+
+        for tr in alertStrSplit[1].split(';'):
+            _signal = messages[int(tr)].strip()
+            _ticker = tickers[t]['key']
+            _group = groups[int(tickers[t]['g'])]
+            _index = t
+            sendMessage(_signal, DHOOK, _ticker, _group, _index)
+
+    return True
+
+
 @app.route("/webhook", methods=['POST'])
 def tradingview_webhook():
 
@@ -95,6 +178,48 @@ def tradingview_webhook():
         return 'ERROR'
 
     logger.info('WEBHOOK DATA: ' +  json.dumps(dataDict))
+
+
+    try:
+        ## check TV code
+        logger.debug(dataDict['tvCode'])
+        if not dataDict['tvCode']:
+            logger.error('CODE ERROR NONE')
+            return 'ERROR'
+        elif int(dataDict['tvCode']) != int(TVCODE):
+            logger.error('CODE MATCH ERROR')
+            return 'ERROR'
+        else:
+            logger.debug('CODE SUCCESS')
+    except Exception as e:
+        logger.error('TV CODE EXCEPTION: ' + str(e))
+        return 'ERROR'
+
+
+    try:
+        resultCheck = getSignal(dataDict)
+        m = 'SEND MESSAGE: ' + str(resultCheck)
+        logger.debug(m)
+    except Exception as e:
+        m = 'SEND MESSAGE: ' + str(e)
+        logger.error(m)
+
+
+    return 'TV WEBHOOK COMPLETE'
+
+
+@app.route("/intraday", methods=['POST'])
+def tradingview_intraday():
+
+    dataDict = None
+
+    try:
+        dataDict = json.loads(request.data)
+    except Exception as e:
+        logger.error('DATA INTRADAY LOAD EXCEPTION ' + str(e))
+        return 'ERROR'
+
+    logger.info('INTRADAY DATA: ' +  json.dumps(dataDict))
 
 
     try:
@@ -215,6 +340,7 @@ def getData():
         print('LOGGER ERROR', e)
 
     return json.dumps(dataDict)
+
 
 
 

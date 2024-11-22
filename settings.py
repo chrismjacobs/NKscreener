@@ -13,6 +13,8 @@ try:
     TVCODE = config.TVCODE
     DEBUG = True
     REDIS_URL = config.REDIS_URL
+    DHOOK_H1 = config.DHOOK_H1
+    DHOOK_H4 = config.DHOOK_H4
     print('CONFIG SUCCESS')
     LOCAL = True
 except:
@@ -22,6 +24,8 @@ except:
     TVCODE = os.environ['TVCODE']
     RANGE = os.environ['RANGE']
     REDIS_URL = os.environ['REDIS_URL']
+    DHOOK_H1 = os.environ['DHOOK_H1']
+    DHOOK_H4 = os.environ['DHOOK_H4']
     DEBUG = False
     LOCAL = False
 
